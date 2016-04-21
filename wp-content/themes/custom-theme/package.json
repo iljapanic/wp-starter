@@ -1,0 +1,28 @@
+{
+  "name": "wp-starter",
+  "version": "0.1.0",
+  "description": "Wordpress starter theme based on Bones",
+  "author": "Ilja Panic <hello@iljapanic.me>",
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Ilja Panic",
+      "email": "hello@iljapanic.me"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iljapanic/wp-starter"
+  },
+  "devDependencies": {
+    "browser-sync": "*",
+    "gulp": "*",
+    "gulp-autoprefixer": "*",
+    "gulp-cssnano": "*",
+    "gulp-group-css-media-queries": "*",
+    "gulp-notify": "*",
+    "gulp-sass": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-util": "*"
+  }
+}
