@@ -44,15 +44,22 @@ class WPSEO_Taxonomy_Fields_Presenter {
 	private function form_row( $field_name, array $field_options ) {
 		$esc_field_name = esc_attr( $field_name );
 
-		$label = $this->get_label( $field_options['label'], $esc_field_name );
-		$field = $this->get_field( $field_options['type'], $esc_field_name, $this->get_field_value( $field_name ) , (array) $field_options['options'] );
-		$help  = $this->get_help( $field, $field_options['description'], $esc_field_name );
+		$options = (array) $field_options['options'];
+
+		if ( ! empty( $field_options['description'] ) ) {
+			$options['description'] = $field_options['description'];
+		}
+
+		$label            = $this->get_label( $field_options['label'], $esc_field_name );
+		$field            = $this->get_field( $field_options['type'], $esc_field_name, $this->get_field_value( $field_name ), $options );
+		$help_button_text = isset( $field_options['options']['help-button'] ) ? $field_options['options']['help-button'] : '';
+		$help             = new WPSEO_Admin_Help_Panel( $field_name, $help_button_text, $field_options['description'] );
 
 		return $this->parse_row( $label, $help, $field );
 	}
 
 	/**
-	 * Generates the html for the the given field config
+	 * Generates the html for the given field config.
 	 *
 	 * @param string $field_type  The fieldtype, e.g: text, checkbox, etc.
 	 * @param string $field_name  The name of the field.
@@ -61,7 +68,7 @@ class WPSEO_Taxonomy_Fields_Presenter {
 	 *
 	 * @return string
 	 */
-	private function get_field($field_type, $field_name, $field_value, array $options) {
+	private function get_field( $field_type, $field_name, $field_value, array $options ) {
 
 		$class = $this->get_class( $options );
 		$field = '';
@@ -85,7 +92,7 @@ class WPSEO_Taxonomy_Fields_Presenter {
 				break;
 			case 'upload' :
 				$field .= '<input id="' . $field_name . '" type="text" size="36" name="' . $field_name . '" value="' . esc_attr( $field_value ) . '" />';
-				$field .= '<input id="' . $field_name . '_button" class="wpseo_image_upload_button button" type="button" value="' . __( 'Upload Image', 'wordpress-seo' ) . '" />';
+				$field .= '<input id="' . $field_name . '_button" class="wpseo_image_upload_button button" type="button" value="' . esc_attr__( 'Upload Image', 'wordpress-seo' ) . '" />';
 				break;
 			case 'select' :
 				if ( is_array( $options ) && $options !== array() ) {
@@ -161,57 +168,17 @@ class WPSEO_Taxonomy_Fields_Presenter {
 	}
 
 	/**
-	 * Returns the help text
-	 *
-	 * @param string $field_html The generated HTML for the field.
-	 * @param string $help_text  The help text that will be displayed.
-	 * @param string $field_name The field name.
-	 *
-	 * @return string
-	 */
-	private function get_help( $field_html, $help_text, $field_name ) {
-		if ( $field_html !== '' && ( is_string( $help_text ) && $help_text !== '' ) ) {
-			return $this->parse_help( $field_name, $help_text );
-		}
-
-		return '';
-	}
-
-	/**
-	 * Parsing question mark with the help-text
-	 *
-	 * @param string $field_name The name of the field where the helptext is generated for.
-	 * @param string $help_text  The help text itself.
-	 *
-	 * @return string
-	 */
-	private function parse_help( $field_name, $help_text ) {
-		static $image_src;
-
-		if ( $image_src === null ) {
-			$image_src = plugins_url( 'images/question-mark.png', WPSEO_FILE );
-		}
-
-		return sprintf(
-			'<img src="%1$s" class="alignright yoast_help" id="%2$s" alt="%3$s" />',
-			$image_src,
-			esc_attr( $field_name . 'help' ),
-			esc_attr( $help_text )
-		);
-	}
-
-	/**
 	 * Returns the HTML for the row which contains label, help and the field.
 	 *
-	 * @param string $label The html for the label if there was a label set.
-	 * @param string $help  The html for the help, when it's there.
-	 * @param string $field The html for the field.
+	 * @param string                 $label       The html for the label if there was a label set.
+	 * @param WPSEO_Admin_Help_Panel $help        The help panel to render in this row.
+	 * @param string                 $field       The html for the field.
 	 *
 	 * @return string
 	 */
-	private function parse_row( $label, $help, $field ) {
+	private function parse_row( $label, WPSEO_Admin_Help_Panel $help, $field ) {
 		if ( $label !== '' || $help !== '' ) {
-			return '<tr><th scope="row">' . $label . $help . '</th><td>' . $field . '</td></tr>';
+			return '<tr><th scope="row">' . $label . $help->get_button_html() . '</th><td>' . $help->get_panel_html() . $field . '</td></tr>';
 		}
 
 		return $field;
